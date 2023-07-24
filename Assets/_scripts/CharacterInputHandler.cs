@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
+using ZenjectBasedController.Signals;
 using ZenjectBasedController.State;
 
 namespace ZenjectBasedController.Handler
@@ -10,6 +11,7 @@ namespace ZenjectBasedController.Handler
     {
         readonly CharacterInputState _inputState;
         private WASD _playerInputAction;
+        readonly SignalBus _signalBus;
         public void Initialize()
         {
             _playerInputAction = new WASD();
@@ -27,9 +29,13 @@ namespace ZenjectBasedController.Handler
             _playerInputAction.Player.Jump.performed -= JumpInputAction;
         }
 
-        public CharacterInputHandler(CharacterInputState inputState)
+        public CharacterInputHandler(
+            CharacterInputState inputState,
+            SignalBus signalBus
+            )
         {
             _inputState = inputState;
+            _signalBus = signalBus;
         }
         /// <summary>
         /// Reads the player movement input.
@@ -39,8 +45,9 @@ namespace ZenjectBasedController.Handler
         {
             Vector2 _context = context.ReadValue<Vector2>();
             Vector3 _moveContext = new Vector3(_context.x, 0, _context.y);
-            _inputState.MoveContext = _moveContext;
-            Debug.Log(_moveContext);
+            _inputState.MoveContext = _moveContext; // MoveSignal
+            MoveSignal moveSignal = new MoveSignal() { MoveVector = _moveContext };
+            _signalBus.Fire(moveSignal);
         }
         /// <summary>
         /// Reads the player jump input.
@@ -48,14 +55,7 @@ namespace ZenjectBasedController.Handler
         /// <param name="context">The jump input's context.</param>
         public void JumpInputAction(InputAction.CallbackContext context)
         {
-            float jumpContext = context.ReadValue<float>();
-            _inputState.jumpContext = new Vector3(0, jumpContext, 0);
-            Debug.Log(context.ReadValue<float>());
-
-            // if (context.started) // button down
-            // {
-            //     _timeSinceJumpPressed = 0f;
-            // }
+            _signalBus.Fire<JumpSignal>();
         }
     }
 }

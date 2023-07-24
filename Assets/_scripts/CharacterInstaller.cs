@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using ZenjectBasedController.Character.Settings;
+using ZenjectBasedController.Signals;
 using ZenjectBasedController.Handler;
 using ZenjectBasedController.State;
 
@@ -27,6 +28,23 @@ namespace ZenjectBasedController.Character.Installer
             Container.Bind<CharacterInputState>().AsSingle();
 
             // Container.BindInterfacesTo<PlayerHealthWatcher>().AsSingle();
+            InstallSignals();
+        }
+
+        void InstallSignals()
+        {
+            // Every scene that uses signals needs to install the built-in installer SignalBusInstaller
+            // Or alternatively it can be installed at the project context level (see docs for details)
+            SignalBusInstaller.Install(Container);
+
+            // Signals can be useful for game-wide events that could have many interested parties
+            Container.DeclareSignal<JumpSignal>();
+            Container.BindSignal<JumpSignal>()
+            .ToMethod(() => Debug.Log("Jump!"));
+
+            Container.DeclareSignal<MoveSignal>();
+            Container.BindSignal<MoveSignal>()
+            .ToMethod(() => Debug.Log("Move!"));
         }
     }
 }

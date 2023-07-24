@@ -12,13 +12,31 @@ public class CharacterModel
     {
         _rigidBody = rigidBody;
     }
-    public void AddForceAtPosition(Vector3 force, Vector3 pos)
+    public void AddRbForceAtPosition(Vector3 force, Vector3 pos)
     {
         _rigidBody.AddForceAtPosition(force, pos);
     }
-    public Vector3 GetRigidbodyVelocity()
+    public void AddForce(Vector3 _force)
     {
-        return _rigidBody.velocity;
+        _rigidBody.AddForce(_force);
+    }
+    public void AddForce(Vector3 _force, ForceMode _mode)
+    {
+        _rigidBody.AddForce(_force, _mode);
+    }
+    public Vector3 GetGravitationalForce()
+    {
+        return Physics.gravity * _rigidBody.mass;
+    }
+    public Vector3 RigidbodyVelocity
+    {
+        get { return _rigidBody.velocity; }
+        set { _rigidBody.velocity = value; }
+    }
+    public Vector3 RigidbodyAngularVelocity
+    {
+        get { return _rigidBody.angularVelocity; }
+        set { _rigidBody.angularVelocity = value; }
     }
 
     public float GetRigidbodyMass()

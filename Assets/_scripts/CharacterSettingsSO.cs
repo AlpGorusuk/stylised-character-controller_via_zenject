@@ -11,11 +11,6 @@ namespace ZenjectBasedController.Settings
     public class CharacterSettingsSO : ScriptableObjectInstaller<CharacterSettingsSO>
     {
         public RayCastHandler.RayCastHandlerSettings rayCastHandlerSettings;
-        [Serializable]
-        public class RaycastSettings
-        {
-            public RayCastHandler.RayCastHandlerSettings RayCastHandlerSettings;
-        }
 
         public override void InstallBindings()
         {

@@ -9,13 +9,19 @@ namespace ZenjectBasedController.Handler
 {
     public class RayCastHandler
     {
-        readonly CharacterMoveHandler.CharacterMovementSettings _characterMovementSettings;
+        readonly CharacterMoveHandler.CharacterMoveSettings _characterMovementSettings;
+        readonly CharacterMoveHandler.CharacterJumpSettings _characterJumpSettings;
         readonly RayCastHandlerSettings _rayCastHandlerSettings;
         public RayCastHandler(
-            RayCastHandlerSettings rayCastHandlerSettings
+            RayCastHandlerSettings rayCastHandlerSettings,
+            CharacterModel characterModel,
+            CharacterMoveHandler.CharacterMoveSettings characterMovementSettings,
+            CharacterMoveHandler.CharacterJumpSettings characterJumpSettings
             )
         {
             _rayCastHandlerSettings = rayCastHandlerSettings;
+            _characterMovementSettings = characterMovementSettings;
+            _characterJumpSettings = characterJumpSettings;
         }
         public bool CheckIfGrounded(bool rayHitGround, RaycastHit rayHit)
         {
@@ -37,16 +43,16 @@ namespace ZenjectBasedController.Handler
         /// Perfom raycast towards the ground.
         /// </summary>
         /// <returns>Whether the ray hit the ground, and information about the ray.</returns>
-        public RaycastHit RaycastToGround(Vector3 _pos)
+        public (RaycastHit, bool) RaycastToGround(Vector3 _pos)
         {
             RaycastHit rayHit;
             Vector3 pos = _pos;
             Vector3 rayDir = _rayCastHandlerSettings._rayDir;
             Ray rayToGround = new Ray(_pos, rayDir);
             float rayToGroundLength = _rayCastHandlerSettings._rayToGroundLength;
-            Physics.Raycast(rayToGround, out rayHit, rayToGroundLength, _rayCastHandlerSettings._terrainLayer.value);
+            bool rayHitGround = Physics.Raycast(rayToGround, out rayHit, rayToGroundLength, _rayCastHandlerSettings._terrainLayer.value);
             Debug.DrawRay(_pos, rayDir * rayToGroundLength, Color.blue);
-            return (rayHit);
+            return (rayHit, rayHitGround);
         }
         [Serializable]
         public class RayCastHandlerSettings

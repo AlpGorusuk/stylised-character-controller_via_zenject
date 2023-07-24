@@ -10,16 +10,18 @@ namespace ZenjectBasedController.Settings
     [CreateAssetMenu(menuName = "StylisedCharacter/Movement Settings")]
     public class CharacterMovementSettingsSO : ScriptableObjectInstaller<CharacterMovementSettingsSO>
     {
-        public CharacterMoveHandler.CharacterMovementSettings characterMovementSettings;
-        [Serializable]
-        public class MovementSettings
-        {
-            public CharacterMoveHandler.CharacterMovementSettings CharacterMovementSettings;
-        }
+        public CharacterMoveHandler.CharacterMoveSettings characterMovementSettings;
+        public CharacterMoveHandler.CharacterJumpSettings characterJumpSettings;
+        // [Serializable]
+        // public class MovementSettings
+        // {
+        //     public CharacterMoveHandler.CharacterMoveSettings CharacterMovementSettings;
+        // }
 
         public override void InstallBindings()
         {
             Container.BindInstance(characterMovementSettings).IfNotBound();
+            Container.BindInstance(characterJumpSettings).IfNotBound();
         }
     }
 }

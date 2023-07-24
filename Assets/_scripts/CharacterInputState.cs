@@ -16,6 +16,5 @@ namespace ZenjectBasedController.State
             get;
             set;
         }
-        public Vector3 _m_GoalVel = Vector3.zero;
     }
 }
