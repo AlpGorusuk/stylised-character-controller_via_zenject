@@ -7,6 +7,6 @@ namespace ZenjectBasedController.Character.Settings
     public class ModelSettings
     {
         public Rigidbody Rigidbody;
-        // public MeshRenderer MeshRenderer;
+        public Transform Transform;
     }
 }

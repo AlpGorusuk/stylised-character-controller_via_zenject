@@ -12,11 +12,6 @@ namespace ZenjectBasedController.Settings
     {
         public CharacterMoveHandler.CharacterMoveSettings characterMovementSettings;
         public CharacterMoveHandler.CharacterJumpSettings characterJumpSettings;
-        // [Serializable]
-        // public class MovementSettings
-        // {
-        //     public CharacterMoveHandler.CharacterMoveSettings CharacterMovementSettings;
-        // }
 
         public override void InstallBindings()
         {

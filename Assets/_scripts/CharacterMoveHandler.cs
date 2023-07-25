@@ -4,20 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using ZenjectBasedController.Signals;
-using ZenjectBasedController.State;
 
 namespace ZenjectBasedController.Handler
 {
     public class CharacterMoveHandler : IInitializable, IFixedTickable, IDisposable
     {
-        readonly CharacterInputState _inputState;
         readonly CharacterMoveSettings _characterMoveSettings;
         readonly CharacterJumpSettings _characterJumpSettings;
         readonly RayCastHandler _rayCastHandler;
         readonly CharacterModel _characterModel;
         readonly SignalBus _signalBus;
         public CharacterMoveHandler(
-            CharacterInputState inputState,
             CharacterMoveSettings characterMoveSettings,
             CharacterJumpSettings characterJumpSettings,
             CharacterModel characterModel,
@@ -27,7 +24,6 @@ namespace ZenjectBasedController.Handler
         {
             _characterMoveSettings = characterMoveSettings;
             _characterJumpSettings = characterJumpSettings;
-            _inputState = inputState;
             _characterModel = characterModel;
             _rayCastHandler = rayCastHandler;
             _signalBus = signalBus;
@@ -65,7 +61,7 @@ namespace ZenjectBasedController.Handler
         /// </summary>
         private void CharacterMove(RaycastHit rayHit, bool rayHitGround)
         {
-            Vector3 m_UnitGoal = MoveVector;
+            Vector3 m_UnitGoal = _characterMoveSettings._moveVector;
             Vector3 _m_GoalVel = Vector3.zero;
             Vector3 unitVel = _m_GoalVel.normalized;
             Vector3 _rbVel = _characterModel.RigidbodyVelocity;
@@ -89,12 +85,7 @@ namespace ZenjectBasedController.Handler
         }
         void OnMoveSignal(MoveSignal args)
         {
-            MoveVector = args.MoveVector;
-        }
-        Vector3 MoveVector
-        {
-            get;
-            set;
+            _characterMoveSettings._moveVector = args.MoveVector;
         }
         /// <summary>
         /// Apply force to cause the character to perform a single jump, including coyote time and a jump input buffer.
@@ -129,6 +120,9 @@ namespace ZenjectBasedController.Handler
                 }
             }
         }
+        /// <summary>
+        /// For Jump Signal
+        /// </summary>
         private void OnJumpSignal()
         {
             _characterJumpSettings._isJumping = false;
@@ -157,6 +151,7 @@ namespace ZenjectBasedController.Handler
             public AnimationCurve _accelerationFactorFromDot;
             public AnimationCurve _maxAccelerationForceFactorFromDot;
             public Vector3 _moveForceScale = new Vector3(1f, 0f, 1f);
+            public Vector3 _moveVector { get; set; }
 
             [Header("Jump:")]
             public float _jumpForceFactor = 10f;

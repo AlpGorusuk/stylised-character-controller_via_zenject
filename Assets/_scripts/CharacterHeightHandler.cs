@@ -1,21 +1,38 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
+using Zenject;
 using ZenjectBasedController.Handler;
 
 namespace ZenjectBasedController
 {
-    public class CharacterHeightHandler
+    public class CharacterHeightHandler : IFixedTickable
     {
         readonly CharacterModel _characterModel;
         readonly CharacterMoveHandler.CharacterMoveSettings _characterMovementSettings;
-        readonly RayCastHandler.RayCastHandlerSettings rayCastHandlerSettings;
+        readonly HeightSettings _heightSettings;
+        readonly RayCastHandler.RayCastHandlerSettings _rayCastHandlerSettings;
+        readonly RayCastHandler _rayCastHandler;
         public CharacterHeightHandler(
 
-            CharacterModel characterModel
+            CharacterModel characterModel,
+            RayCastHandler rayCastHandler,
+            HeightSettings heightSettings,
+            CharacterMoveHandler.CharacterMoveSettings characterMoveSettings,
+            RayCastHandler.RayCastHandlerSettings rayCastHandlerSettings
             )
         {
             _characterModel = characterModel;
+            _rayCastHandler = rayCastHandler;
+            _heightSettings = heightSettings;
+            _characterMovementSettings = characterMoveSettings;
+            _rayCastHandlerSettings = rayCastHandlerSettings;
+        }
+
+        public void FixedTick()
+        {
+            (RaycastHit rayHit, bool rayHitGround) = _rayCastHandler.RaycastToGround(_characterModel.Position);
+            MaintainUpright(_characterMovementSettings._moveVector, rayHit);
+            MaintainHeight(rayHit, rayHitGround);
         }
 
         /// <summary>
@@ -24,8 +41,9 @@ namespace ZenjectBasedController
         /// Additionally applies the oscillator force to the squash and stretch oscillator, and any object beneath.
         /// </summary>
         /// <param name="rayHit">Information about the RaycastToGround.</param>
-        private void MaintainHeight(RaycastHit rayHit)
+        private void MaintainHeight(RaycastHit rayHit, bool rayHitGround)
         {
+            if (!rayHitGround) { return; }
             Vector3 vel = _characterModel.RigidbodyVelocity;
             Vector3 otherVel = Vector3.zero;
             Rigidbody hitBody = rayHit.rigidbody;
@@ -33,8 +51,8 @@ namespace ZenjectBasedController
             {
                 otherVel = hitBody.velocity;
             }
-            float rayDirVel = Vector3.Dot(rayCastHandlerSettings._rayDir, vel);
-            float otherDirVel = Vector3.Dot(rayCastHandlerSettings._rayDir, otherVel);
+            float rayDirVel = Vector3.Dot(_rayCastHandlerSettings._rayDir, vel);
+            float otherDirVel = Vector3.Dot(_rayCastHandlerSettings._rayDir, otherVel);
 
             float relVel = rayDirVel - otherDirVel;
             float currHeight = rayHit.distance - _characterMovementSettings._rideHeight;
@@ -57,78 +75,39 @@ namespace ZenjectBasedController
         /// </summary>
         /// <param name="yLookAt">The input look rotation.</param>
         /// <param name="rayHit">The rayHit towards the platform.</param>
-        // private void MaintainUpright(Vector3 yLookAt, RaycastHit rayHit = new RaycastHit())
-        // {
-        //     CalculateTargetRotation(yLookAt, rayHit);
+        private void MaintainUpright(Vector3 yLookAt, RaycastHit rayHit = new RaycastHit())
+        {
+            _heightSettings._uprightTargetRot = CalculateTargetRotation(yLookAt);
 
-        //     Quaternion currentRot = transform.rotation;
-        //     Quaternion toGoal = MathsUtils.ShortestRotation(_uprightTargetRot, currentRot);
+            Quaternion currentRot = _characterModel.Rotation;
+            Quaternion toGoal = MathsUtils.ShortestRotation(_heightSettings._uprightTargetRot, currentRot);
 
-        //     Vector3 rotAxis;
-        //     float rotDegrees;
+            Vector3 rotAxis;
+            float rotDegrees;
 
-        //     toGoal.ToAngleAxis(out rotDegrees, out rotAxis);
-        //     rotAxis.Normalize();
+            toGoal.ToAngleAxis(out rotDegrees, out rotAxis);
+            rotAxis.Normalize();
 
-        //     float rotRadians = rotDegrees * Mathf.Deg2Rad;
+            float rotRadians = rotDegrees * Mathf.Deg2Rad;
 
-        //     _rb.AddTorque((rotAxis * (rotRadians * _uprightSpringStrength)) - (_rb.angularVelocity * _uprightSpringDamper));
-        // }
+            _characterModel.AddTorque((rotAxis * (rotRadians * _characterMovementSettings._uprightSpringStrength)) - (_characterModel.RigidbodyAngularVelocity * _characterMovementSettings._uprightSpringDamper));
+        }
         /// <summary>
         /// Determines the desired y rotation for the character, with account for platform rotation.
         /// </summary>
         /// <param name="yLookAt">The input look rotation.</param>
         /// <param name="rayHit">The rayHit towards the platform.</param>
-        // private void CalculateTargetRotation(Vector3 yLookAt, RaycastHit rayHit = new RaycastHit())
-        // {
-        //     if (didLastRayHit)
-        //     {
-        //         _lastTargetRot = _uprightTargetRot;
-        //         try
-        //         {
-        //             _platformInitRot = transform.parent.rotation.eulerAngles;
-        //         }
-        //         catch
-        //         {
-        //             _platformInitRot = Vector3.zero;
-        //         }
-        //     }
-        //     if (rayHit.rigidbody == null)
-        //     {
-        //         didLastRayHit = true;
-        //     }
-        //     else
-        //     {
-        //         didLastRayHit = false;
-        //     }
-
-        //     if (yLookAt != Vector3.zero)
-        //     {
-        //         _uprightTargetRot = Quaternion.LookRotation(yLookAt, Vector3.up);
-        //         _lastTargetRot = _uprightTargetRot;
-        //         try
-        //         {
-        //             _platformInitRot = transform.parent.rotation.eulerAngles;
-        //         }
-        //         catch
-        //         {
-        //             _platformInitRot = Vector3.zero;
-        //         }
-        //     }
-        //     else
-        //     {
-        //         try
-        //         {
-        //             Vector3 platformRot = transform.parent.rotation.eulerAngles;
-        //             Vector3 deltaPlatformRot = platformRot - _platformInitRot;
-        //             float yAngle = _lastTargetRot.eulerAngles.y + deltaPlatformRot.y;
-        //             _uprightTargetRot = Quaternion.Euler(new Vector3(0f, yAngle, 0f));
-        //         }
-        //         catch
-        //         {
-
-        //         }
-        //     }
-        // }
+        private Quaternion CalculateTargetRotation(Vector3 yLookAt)
+        {
+            return Quaternion.LookRotation(yLookAt, Vector3.up);
+        }
+        public class HeightSettings
+        {
+            public Quaternion _uprightTargetRot = Quaternion.identity; // Adjust y value to match the desired direction to face.
+            public Quaternion _lastTargetRot;
+            public Vector3 _platformInitRot;
+            public bool didLastRayHit;
+            public bool _shouldMaintainHeight = true;
+        }
     }
 }

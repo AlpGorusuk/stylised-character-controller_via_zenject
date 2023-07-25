@@ -5,7 +5,6 @@ using Zenject;
 using ZenjectBasedController.Character.Settings;
 using ZenjectBasedController.Signals;
 using ZenjectBasedController.Handler;
-using ZenjectBasedController.State;
 
 namespace ZenjectBasedController.Character.Installer
 {
@@ -16,16 +15,15 @@ namespace ZenjectBasedController.Character.Installer
         public override void InstallBindings()
         {
             Container.Bind<CharacterModel>().AsSingle()
-                .WithArguments(_modelSettings.Rigidbody);
+                .WithArguments(_modelSettings.Rigidbody, _modelSettings.Transform);
 
             Container.BindInterfacesAndSelfTo<CharacterInputHandler>().AsSingle();
             Container.Bind<RayCastHandler>().AsSingle();
             Container.BindInterfacesAndSelfTo<CharacterMoveHandler>().AsSingle();
-            // Container.BindInterfacesAndSelfTo<PlayerDamageHandler>().AsSingle();
+            Container.BindInterfacesAndSelfTo<CharacterHeightHandler>().AsSingle();
+            Container.Bind<CharacterHeightHandler.HeightSettings>().AsSingle();
             // Container.BindInterfacesTo<PlayerDirectionHandler>().AsSingle();
             // Container.BindInterfacesTo<PlayerShootHandler>().AsSingle();
-
-            Container.Bind<CharacterInputState>().AsSingle();
 
             // Container.BindInterfacesTo<PlayerHealthWatcher>().AsSingle();
             InstallSignals();

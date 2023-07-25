@@ -5,12 +5,15 @@ using UnityEngine;
 public class CharacterModel
 {
     readonly Rigidbody _rigidBody;
+    readonly Transform _transform;
 
     public CharacterModel(
-            Rigidbody rigidBody
+            Rigidbody rigidBody,
+            Transform transform
            )
     {
         _rigidBody = rigidBody;
+        _transform = transform;
     }
     public void AddRbForceAtPosition(Vector3 force, Vector3 pos)
     {
@@ -23,6 +26,10 @@ public class CharacterModel
     public void AddForce(Vector3 _force, ForceMode _mode)
     {
         _rigidBody.AddForce(_force, _mode);
+    }
+    public void AddTorque(Vector3 _force)
+    {
+        _rigidBody.AddTorque(_force);
     }
     public Vector3 GetGravitationalForce()
     {
@@ -48,9 +55,14 @@ public class CharacterModel
         get { return _rigidBody.position; }
         set { _rigidBody.position = value; }
     }
+    public Quaternion Rotation
+    {
+        get { return _transform.rotation; }
+        set { _rigidBody.rotation = value; }
+    }
     public Vector3 GetLocalScale
     {
-        get { return _rigidBody.transform.localScale; }
-        set { _rigidBody.transform.localScale = value; }
+        get { return _transform.localScale; }
+        set { _transform.localScale = value; }
     }
 }

@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: MovementSettings
   m_EditorClassIdentifier: 
   characterMovementSettings:
-    _rideHeight: 1.75
-    _leniancyRideHeight: 1.3
-    _rideSpringStrength: 50
-    _rideSpringDamper: 5
+    _rideHeight: 2
+    _leniancyRideHeight: 3
+    _rideSpringStrength: 200
+    _rideSpringDamper: 10
     _squashAndStretchOcillator: {fileID: 0}
     _uprightSpringStrength: 40
     _uprightSpringDamper: 5
-    _maxSpeed: 8
-    _acceleration: 200
-    _maxAccelForce: 150
-    _leanFactor: 0.25
+    _maxSpeed: 10
+    _acceleration: 400
+    _maxAccelForce: 300
+    _leanFactor: 0.45
     _accelerationFactorFromDot:
       serializedVersion: 2
       m_Curve:
@@ -91,13 +91,13 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     _moveForceScale: {x: 1, y: 0, z: 1}
-    _jumpForceFactor: 10
-    _riseGravityFactor: 5
-    _fallGravityFactor: 10
-    _lowJumpFactor: 2.5
+    _jumpForceFactor: 16
+    _riseGravityFactor: 3
+    _fallGravityFactor: 8
+    _lowJumpFactor: 10
     _jumpBuffer: 0.15
     _coyoteTime: 0.25
   characterJumpSettings:
-    _timeSinceUngrounded: 0.23999996
+    _timeSinceUngrounded: 0
     _jumpReady: 0
     _isJumping: 1

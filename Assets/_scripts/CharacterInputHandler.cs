@@ -3,13 +3,11 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
 using ZenjectBasedController.Signals;
-using ZenjectBasedController.State;
 
 namespace ZenjectBasedController.Handler
 {
     public class CharacterInputHandler : IInitializable, IDisposable
     {
-        readonly CharacterInputState _inputState;
         private WASD _playerInputAction;
         readonly SignalBus _signalBus;
         public void Initialize()
@@ -18,6 +16,7 @@ namespace ZenjectBasedController.Handler
             _playerInputAction.Enable();
 
             _playerInputAction.Player.Move.performed += MoveInputAction;
+            _playerInputAction.Player.Move.canceled += CanceledMoveInputAction;
             _playerInputAction.Player.Jump.performed += JumpInputAction;
         }
 
@@ -26,15 +25,15 @@ namespace ZenjectBasedController.Handler
             _playerInputAction.Dispose();
 
             _playerInputAction.Player.Move.performed -= MoveInputAction;
+            _playerInputAction.Player.Move.canceled -= CanceledMoveInputAction;
+
             _playerInputAction.Player.Jump.performed -= JumpInputAction;
         }
 
         public CharacterInputHandler(
-            CharacterInputState inputState,
             SignalBus signalBus
             )
         {
-            _inputState = inputState;
             _signalBus = signalBus;
         }
         /// <summary>
@@ -45,8 +44,13 @@ namespace ZenjectBasedController.Handler
         {
             Vector2 _context = context.ReadValue<Vector2>();
             Vector3 _moveContext = new Vector3(_context.x, 0, _context.y);
-            _inputState.MoveContext = _moveContext; // MoveSignal
+
             MoveSignal moveSignal = new MoveSignal() { MoveVector = _moveContext };
+            _signalBus.Fire(moveSignal);
+        }
+        public void CanceledMoveInputAction(InputAction.CallbackContext context)
+        {
+            MoveSignal moveSignal = new MoveSignal() { MoveVector = Vector3.zero };
             _signalBus.Fire(moveSignal);
         }
         /// <summary>
