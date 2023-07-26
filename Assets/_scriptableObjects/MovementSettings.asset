@@ -97,7 +97,3 @@ MonoBehaviour:
     _lowJumpFactor: 10
     _jumpBuffer: 0.15
     _coyoteTime: 0.25
-  characterJumpSettings:
-    _timeSinceUngrounded: 0
-    _jumpReady: 0
-    _isJumping: 1

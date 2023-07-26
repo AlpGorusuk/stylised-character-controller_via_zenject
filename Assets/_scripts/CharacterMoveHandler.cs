@@ -100,16 +100,14 @@ namespace ZenjectBasedController.Handler
             {
                 // Increase downforce for a sudden plummet.
                 Vector3 _force = _gravitationalForce * (_characterMoveSettings._riseGravityFactor);
+                _characterJumpSettings._jumpReady = false;
                 _characterModel.AddForce(_force);
             }
 
-            if (_characterJumpSettings._timeSinceUngrounded < _characterMoveSettings._coyoteTime) //BURADA BUTTONDAN JUMP READY TRUE OLCAK
+            if (_characterJumpSettings._timeSinceUngrounded < _characterMoveSettings._coyoteTime)
             {
                 if (_characterJumpSettings._jumpReady)
                 {
-                    _characterJumpSettings._jumpReady = false;
-                    // _shouldMaintainHeight = false;
-                    _characterJumpSettings._isJumping = true;
                     _characterModel.RigidbodyVelocity = new Vector3(_characterModel.RigidbodyVelocity.x, 0f, _characterModel.RigidbodyVelocity.z);
 
                     if (rayHit.distance != 0) // i.e. if the ray has hit
@@ -125,7 +123,6 @@ namespace ZenjectBasedController.Handler
         /// </summary>
         private void OnJumpSignal()
         {
-            _characterJumpSettings._isJumping = false;
             _characterJumpSettings._jumpReady = true;
         }
 
@@ -165,7 +162,7 @@ namespace ZenjectBasedController.Handler
         public class CharacterJumpSettings
         {
             public float _timeSinceUngrounded = 0f;
-            public bool _jumpReady = true;
+            public bool _jumpReady = false;
             public bool _isJumping = false;
         }
     }

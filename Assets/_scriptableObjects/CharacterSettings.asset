@@ -18,4 +18,4 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 64
     _rayDir: {x: 0, y: -1, z: 0}
-    _rayToGroundLength: 3
+    _rayToGroundLength: 2

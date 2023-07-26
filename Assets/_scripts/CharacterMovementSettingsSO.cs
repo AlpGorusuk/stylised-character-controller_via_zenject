@@ -11,12 +11,10 @@ namespace ZenjectBasedController.Settings
     public class CharacterMovementSettingsSO : ScriptableObjectInstaller<CharacterMovementSettingsSO>
     {
         public CharacterMoveHandler.CharacterMoveSettings characterMovementSettings;
-        public CharacterMoveHandler.CharacterJumpSettings characterJumpSettings;
 
         public override void InstallBindings()
         {
             Container.BindInstance(characterMovementSettings).IfNotBound();
-            Container.BindInstance(characterJumpSettings).IfNotBound();
         }
     }
 }

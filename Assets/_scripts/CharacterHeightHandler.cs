@@ -8,10 +8,10 @@ namespace ZenjectBasedController
     public class CharacterHeightHandler : IFixedTickable
     {
         readonly CharacterModel _characterModel;
+        readonly RayCastHandler _rayCastHandler;
+        readonly RayCastHandler.RayCastHandlerSettings _rayCastHandlerSettings;
         readonly CharacterMoveHandler.CharacterMoveSettings _characterMovementSettings;
         readonly HeightSettings _heightSettings;
-        readonly RayCastHandler.RayCastHandlerSettings _rayCastHandlerSettings;
-        readonly RayCastHandler _rayCastHandler;
         public CharacterHeightHandler(
 
             CharacterModel characterModel,
@@ -43,7 +43,7 @@ namespace ZenjectBasedController
         /// <param name="rayHit">Information about the RaycastToGround.</param>
         private void MaintainHeight(RaycastHit rayHit, bool rayHitGround)
         {
-            if (!rayHitGround) { return; }
+            if (!rayHitGround || (_characterModel.RigidbodyVelocity.y != 0 && !rayHitGround)) { return; }
             Vector3 vel = _characterModel.RigidbodyVelocity;
             Vector3 otherVel = Vector3.zero;
             Rigidbody hitBody = rayHit.rigidbody;
@@ -99,15 +99,16 @@ namespace ZenjectBasedController
         /// <param name="rayHit">The rayHit towards the platform.</param>
         private Quaternion CalculateTargetRotation(Vector3 yLookAt)
         {
-            return Quaternion.LookRotation(yLookAt, Vector3.up);
+            if (yLookAt != Vector3.zero)
+            {
+                _heightSettings._lastTargetVec = yLookAt;
+            }
+            return Quaternion.LookRotation(_heightSettings._lastTargetVec, Vector3.up);
         }
         public class HeightSettings
         {
             public Quaternion _uprightTargetRot = Quaternion.identity; // Adjust y value to match the desired direction to face.
-            public Quaternion _lastTargetRot;
-            public Vector3 _platformInitRot;
-            public bool didLastRayHit;
-            public bool _shouldMaintainHeight = true;
+            public Vector3 _lastTargetVec = Vector3.zero;
         }
     }
 }

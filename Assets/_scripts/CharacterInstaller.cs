@@ -22,6 +22,7 @@ namespace ZenjectBasedController.Character.Installer
             Container.BindInterfacesAndSelfTo<CharacterMoveHandler>().AsSingle();
             Container.BindInterfacesAndSelfTo<CharacterHeightHandler>().AsSingle();
             Container.Bind<CharacterHeightHandler.HeightSettings>().AsSingle();
+            Container.Bind<CharacterMoveHandler.CharacterJumpSettings>().AsSingle();
             // Container.BindInterfacesTo<PlayerDirectionHandler>().AsSingle();
             // Container.BindInterfacesTo<PlayerShootHandler>().AsSingle();
 
